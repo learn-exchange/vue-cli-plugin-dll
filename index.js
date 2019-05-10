@@ -35,12 +35,12 @@ module.exports = (api, options) => {
           );
         // add copy agrs
         config.plugin('copy').tap(args => {
-          args[0][0].ignore.push(dll.outputDir + '/**');
-          args[0].push({
-            from: dll.outputPath,
-            toType: 'dir',
-            ignore: ['*.js', '*.css', '*.manifest.json']
-          });
+          // args[0][0].ignore.push(dll.outputDir + '/**');
+          // args[0].push({
+          //   from: dll.outputPath,
+          //   toType: 'dir',
+          //   ignore: ['*.js', '*.css', '*.manifest.json']
+          // });
           return args;
         });
       }
@@ -62,9 +62,14 @@ module.exports = (api, options) => {
         throw Error('"entry" parameter no found, more config url:');
       }
 
-      const FileNameCachePlugin = require('./src/fileNameCachePlugin');
+      const FileNameCachePlugin = require('./service/fileNameCachePlugin');
 
       api.chainWebpack(config => {
+        const extractOptions = Object.assign({
+          filename: 'css/[name].[contenthash:8].css',
+          chunkFilename: 'css/[name].[contenthash:8].css'
+        }, {});
+
         config
           .plugin('dll')
           .use(webpack.DllPlugin, dll.resolveDllArgs())
@@ -75,9 +80,72 @@ module.exports = (api, options) => {
         config.optimization.delete('splitChunks');
         config.optimization.delete('runtimeChunk');
         config.devtool(false);
+        // console.log('config', config);
+        // fonts images media
+        const staticRes = ['fonts', 'images', 'media'];
+        staticRes.forEach((type) => genUrlLoaderOptions(type));
+
+        function genUrlLoaderOptions(type) {
+          config.module
+            .rule(type)
+            .use('url-loader')
+            .loader('url-loader')
+            .tap((options) => {
+              // options.fallback loader -> file-loader
+              options.fallback.options['name'] = `${type === 'images' ? 'img' : type}/[name].[hash:8].[ext]`;
+              return options;
+            })
+            .end();
+        }
+
+        // svg
+        config.module
+          .rule('svg')
+          .use('file-loader')
+          .loader('file-loader')
+          .tap((options) => {
+            options['name'] = 'img/[name].[hash:8].[ext]';
+            return options;
+          })
+          .end();
+
+        // 样式文件里的引用的静态资源地址，如 image,fonts...
+        const langs = ['css', 'postcss', 'scss', 'sass', 'less', 'stylus'];
+        const matches = ['vue-modules', 'vue', 'normal-modules', 'normal'];
+
+        langs.forEach(lang =>
+          matches.forEach(match =>
+            config.module
+              .rule(lang)
+              .oneOf(match)
+              .use('extract-css-loader')
+              .loader(require('mini-css-extract-plugin').loader)
+              .options({
+                publicPath: '../'
+              })
+          )
+        );
+
+        // 这种方式也可以
+        // const types = ['vue-modules', 'vue', 'normal-modules', 'normal'];
+        // types.forEach(type => addStyleResource(config.module.rule('css').oneOf(type)));
+        //
+        // function addStyleResource(rule) {
+        //   rule.use('extract-css-loader')
+        //     .loader(require('mini-css-extract-plugin').loader)
+        //     .options({
+        //       publicPath: './'
+        //     }).end();
+        // }
+
+        // mini-css-extract-plugin
+        config
+          .plugin('extract-css')
+          .use(require('mini-css-extract-plugin'), [extractOptions]);
 
         // set output
         forEachObj(dll.resolveOutput(), (fnName, value) => {
+          // console.log('fnName, value', fnName, value);
           isFunctionAndCall(
             config.output[fnName],
             config.output,
@@ -91,7 +159,7 @@ module.exports = (api, options) => {
       let DefinePlugin = require('webpack/lib/DefinePlugin');
       let FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
       let NamedChunksPlugin = require('webpack/lib/NamedChunksPlugin');
-      let MiniCssExtreactPlugin = require('mini-css-extract-plugin');
+      let MiniCssExtractPlugin = require('mini-css-extract-plugin');
       let fs = require('fs-extra');
 
       // filter plugins
@@ -102,15 +170,19 @@ module.exports = (api, options) => {
           DefinePlugin,
           FriendlyErrorsWebpackPlugin,
           NamedChunksPlugin,
-          MiniCssExtreactPlugin,
+          MiniCssExtractPlugin,
           webpack.DllPlugin,
           FileNameCachePlugin
         )
       );
-
+      // console.log('webpack', JSON.stringify(webpackConfig.plugins));
+      // console.log('webpack', webpackConfig.plugins[2]);
+      // webpackConfig.plugins[2].options.filename = '[name].[contenthash:8].css';
+      // webpackConfig.plugins[2].options.chunkFilename = '[name].[contenthash:8].css';
       // reset entry
       webpackConfig.entry = dll.resolveEntry();
-
+      // webpackConfig.output.publicPath = './';
+      // console.log('webpackConfig', JSON.stringify(webpackConfig, null, 2));
       // remove dir
       fs.remove(dll.outputPath);
 

@@ -28,10 +28,11 @@ module.exports = class Dll {
 
   static getDefaultConfig() {
     return {
+      path: 'vendor',
       // manifeat file
       manifest: '[name].manifest.json',
       // output fileName
-      filename: '[name].dll.[hash:8].js',
+      filename: 'js/[name].dll.[hash:8].js',
       // common library name
       library: '[name]_library',
       // the name of directory specified after output
@@ -49,7 +50,7 @@ module.exports = class Dll {
 
     // TODO: release more option
     merge(this, Dll.getDefaultConfig());
-
+    // console.log('this.dllConfig',  this.dllConfig);
     // init
     this.initEntry();
     this.initOutputPath();
@@ -82,6 +83,7 @@ module.exports = class Dll {
       this.outputDir
     );
     this.outputPath = (output && output.path) || DEFAULT_OUTPUT_PATH;
+    // console.log('this.outputPath', this.outputPath);
   }
 
   initOpen() {
@@ -178,9 +180,12 @@ module.exports = class Dll {
     let resolvePathRelativeOutputPathBind = this.resolvePathRelativeOutputPath.bind(
       this
     );
+    const outputPath = this.dllConfig.output;
+    // console.log('outputPath', outputPath);
     let sourceList = getCacheFileNameList().map(
       resolvePathRelativeOutputPathBind
     );
+    // console.log('sourceList', sourceList);
     let assetHtmlPluginArg;
     if (sourceList.length > 0) {
       assetHtmlPluginArg = sourceList
@@ -195,6 +200,7 @@ module.exports = class Dll {
         replaceAsyncName
       )(this.filename);
     }
+    // console.log('assetHtmlPluginArg', assetHtmlPluginArg);
     return [assetHtmlPluginArg];
   }
 };

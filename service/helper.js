@@ -147,7 +147,7 @@ const isAcceptTypeByAssetPluginByPath = compose(
  * get default Args for add-asset-html-webpack-plugin plugin
  * @param {string} filepath filePath
  */
-const getAssetHtmlPluginDefaultArg = filepath => {
+const getAssetHtmlPluginDefaultArg = (filepath) => {
   // 获取格式
   let typeOfAsset = getFileType(filepath);
   if (!isAcceptTypeByAssetPlugin(typeOfAsset)) {
@@ -157,93 +157,12 @@ const getAssetHtmlPluginDefaultArg = filepath => {
     filepath,
     includeSourcemap: false,
     typeOfAsset: typeOfAsset,
-    publicPath: typeOfAsset,
-    outputPath: typeOfAsset
+    // If set, will be used as the public path of the script or link tag.
+    publicPath: `vendor/${typeOfAsset}`,
+    // If set, will be used as the output directory of the file.
+    outputPath: `vendor/${typeOfAsset}`
   };
 };
-
-const cssLoaders = (options) => {
-  options = options || {};
-
-  const cssLoader = {
-    loader: 'css-loader',
-    options: {
-      minimize: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'dll',
-      sourceMap: options.sourceMap
-    }
-  };
-
-  const postcssLoader = {
-    loader: 'postcss-loader',
-    options: {
-      sourceMap: options.sourceMap
-    }
-  };
-
-  // generate loader string to be used with extract text plugin
-  function generateLoaders(loader, loaderOptions) {
-    const loaders = [];
-
-    // Extract CSS when that option is specified
-    // (which is the case during production build)
-    if (options.extract) {
-      loaders.push({
-        loader: MiniCssExtractPlugin.loader,
-        options: {
-          // you can specify a publicPath here
-          // by default it use publicPath in webpackOptions.output
-          // 解决图片作为背景引入时，路径不对的问题
-          publicPath: '../../'
-        }
-      });
-    } else {
-      loaders.push('vue-style-loader');
-    }
-
-    loaders.push(cssLoader);
-
-    if (options.usePostCSS) {
-      loaders.push(postcssLoader);
-    }
-
-    if (loader) {
-      loaders.push({
-        loader: loader + '-loader',
-        options: Object.assign({}, loaderOptions, {
-          sourceMap: options.sourceMap
-        })
-      });
-    }
-
-    return loaders;
-  }
-
-  // https://vue-loader.vuejs.org/en/configurations/extract-css.html
-  return {
-    css: generateLoaders(),
-    postcss: generateLoaders(),
-    less: generateLoaders('less'),
-    sass: generateLoaders('sass', {indentedSyntax: true}),
-    scss: generateLoaders('sass'),
-    stylus: generateLoaders('stylus'),
-    styl: generateLoaders('stylus')
-  };
-};
-
-// Generate loaders for standalone style files (outside of .vue)
-const styleLoaders = (options) => {
-  const output = [];
-  const loaders = cssLoaders(options);
-  for (const extension in loaders) {
-    const loader = loaders[extension];
-    output.push({
-      test: new RegExp('\\.' + extension + '$'),
-      use: loader
-    });
-  }
-  return output;
-};
-
 
 exports.log = log;
 exports.merge = merge;
@@ -255,4 +174,3 @@ exports.isInstallOf = isInstallOf;
 exports.isFunctionAndCall = isFunctionAndCall;
 exports.getAssetHtmlPluginDefaultArg = getAssetHtmlPluginDefaultArg;
 exports.isAcceptTypeByAssetPluginByPath = isAcceptTypeByAssetPluginByPath;
-exports.styleLoaders = styleLoaders;
