@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = (api, options, rootOptions) => {
   api.extendPackage({
     scripts: {
