@@ -2,6 +2,7 @@
 # vue-cli-plugin-dll 
 
 Vue CLI 3 plugin for Dll and DllReference
+
 ## 起步
 
 > 确保你安装的是 vue-cli 3.x.x 版本
@@ -238,3 +239,6 @@ Vue.use(element)
 
 1. 在使用这个分包之前，你要确定好你已经按照elementUI做好按需加载的步骤，配置好babel-plugin-component
 2. 每一次有element.js有改动，需要重新打包一次最新的。执行命令 npm run dll
+
+## 参考
+[fingerpan/vue-cli-plugin-dll](https://github.com/fingerpan/vue-cli-plugin-dll)
