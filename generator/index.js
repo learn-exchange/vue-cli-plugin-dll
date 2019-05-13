@@ -1,5 +1,3 @@
-const path = require('path');
-
 module.exports = (api, options, rootOptions) => {
   api.extendPackage({
     scripts: {
@@ -10,8 +8,7 @@ module.exports = (api, options, rootOptions) => {
         dll: {
           entry: {
             vendor: ['vue', 'vue-router']
-          },
-          output: path.join(__dirname, './public/vendor'),
+          }
         }
       }
     }
