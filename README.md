@@ -16,7 +16,7 @@ $ vue add @liwb/vue-cli-plugin-dll
 
 # OR 
 
-$vue invoke @liwb/vue-cli-plugin-dll 
+$ vue invoke @liwb/vue-cli-plugin-dll 
 ```
 
 
