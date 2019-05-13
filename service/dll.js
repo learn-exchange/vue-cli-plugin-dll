@@ -180,7 +180,7 @@ module.exports = class Dll {
     let resolvePathRelativeOutputPathBind = this.resolvePathRelativeOutputPath.bind(
       this
     );
-    const outputPath = this.dllConfig.output;
+    // const outputPath = this.dllConfig.output;
     // console.log('outputPath', outputPath);
     let sourceList = getCacheFileNameList().map(
       resolvePathRelativeOutputPathBind
