@@ -1,5 +1,6 @@
 const path = require('path');
 const {
+  baseDllPath,
   isObject,
   merge,
   normalizeRntry,
@@ -28,11 +29,10 @@ module.exports = class Dll {
 
   static getDefaultConfig() {
     return {
-      path: 'vendor',
       // manifeat file
       manifest: '[name].manifest.json',
       // output fileName
-      filename: 'js/[name].dll.[hash:8].js',
+      filename: `${baseDllPath}/js/[name].dll.[hash:8].js`,
       // common library name
       library: '[name]_library',
       // the name of directory specified after output

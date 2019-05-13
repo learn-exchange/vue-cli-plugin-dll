@@ -1,5 +1,5 @@
 
-# vue-cli-plugin-dll [![vue-cli3](https://img.shields.io/badge/vue--cli-3.x-brightgreen.svg)](https://github.com/vuejs/vue-cli) ![npm](https://img.shields.io/npm/dm/vue-cli-plugin-dll.svg) [![npm](https://img.shields.io/npm/v/vue-cli-plugin-dll.svg)](https://www.npmjs.com/package/vue-cli-plugin-dll)
+# vue-cli-plugin-dll 
 
 Vue CLI 3 plugin for Dll and DllReference
 ## 起步
@@ -11,11 +11,11 @@ $ vue -V
 
 ### 安装
 ``` bash
-$ vue add dll 
+$ vue add @liwb/vue-cli-plugin-dll 
 
 # OR 
 
-$vue invoke dll
+$vue invoke @liwb/vue-cli-plugin-dll 
 ```
 
 
@@ -55,8 +55,8 @@ module.exports = {
      dll: {
        // 入口配置
       entry: ['vue'],
-      // 输入目录
-      output: path.join(__dirname, './public/dll'),
+      // dll 资源输出目录，但不是最终 dist 目录下 index.html 引用的路径
+      output: path.join(__dirname, './public/vendor'),
 
       // 是否开启 DllReferencePlugin,
 
@@ -68,8 +68,6 @@ module.exports = {
 
       // 2. 'auto' 参数会自动识别是否有先执行npm run dll生成分包，如果没有的情况下则不开启dll。
       open: 'auto',
-
-
 
       // 自动注入到index.html
       // 在构建其他命令的时候，如果开启了自动注入。程序会手动将output中生成的*.dll.js 文件自动注入到index.html中。
@@ -86,7 +84,7 @@ module.exports = {
 | entry | Object/Array/String | 入口配置 | null | true 
 | open | true/false/'auto' | 启用 DllReferencePlugin  | 'auto' | false 
 | output | Object | 打包输出配置 |  | false 
-| output.path | String | 打包后chunk和manifest.json存放的目录 | 'yourProjectPath/public/dll' | false 
+| output.path | String | 打包后chunk和manifest.json存放的目录 | 'yourProjectPath/public/vendor' | false 
 | inject | Boolean | 自动将打包的vendor注入到index.html | true |  false
 | cacheFilePath | String | 将打包后的所有资源路径保存到一个文件(绝对目录路径) | 'yourProjectPath/node_modules/vue-cli-plugin-dll/src' |  false
 
@@ -106,7 +104,7 @@ module.exports = {
 
           // 多入口
           entry: {
-            vendorNameOne: ['vue-route'],
+            vendorNameOne: ['vue-router'],
             vendorNameTwo: ['vue-vuex'], 
          }
       }
@@ -155,11 +153,11 @@ module.exports = {
       dll: {
         entry: ['vue'],
         // 可以打包完的vendor文件放到指定的位置
-        output: path.resolve(__dirname, './public/newDllDir')
+        output: path.resolve(__dirname, './public/vendor')
 
         // or
         output: {
-          path: path.resolve(__dirname, './public/newDllDir')
+          path: path.resolve(__dirname, './public/vendor')
         }
       }
    }
@@ -197,7 +195,7 @@ module.exports = {
 
 ### 按需加载
 由于预打包机制跟主打包机制是完全分割的，所以我们只能采用另外一种方式进行模拟按需打包
->> 在这个例子中，以elemnent-ui为例子，做按需加载部分组件。
+>> 在这个例子中，以element-ui为例子，做按需加载部分组件。
 新建一个element.js文件在项目中（此例子将element.js和main.js入口文件同级）
 ```
 // 引入css

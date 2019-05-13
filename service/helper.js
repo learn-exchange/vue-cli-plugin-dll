@@ -1,5 +1,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+// base path
+const baseDllPath = 'dll';
 /**
  * is plain object
  * @param {any} i validate source
@@ -158,12 +160,13 @@ const getAssetHtmlPluginDefaultArg = (filepath) => {
     includeSourcemap: false,
     typeOfAsset: typeOfAsset,
     // If set, will be used as the public path of the script or link tag.
-    publicPath: `vendor/${typeOfAsset}`,
+    publicPath: `${baseDllPath}/${typeOfAsset}`,
     // If set, will be used as the output directory of the file.
-    outputPath: `vendor/${typeOfAsset}`
+    outputPath: `${baseDllPath}/${typeOfAsset}`
   };
 };
 
+exports.baseDllPath = baseDllPath;
 exports.log = log;
 exports.merge = merge;
 exports.compose = compose;

@@ -1,4 +1,6 @@
+const path = require('path');
 const {
+  baseDllPath,
   log,
   isInstallOf,
   forEachObj,
@@ -35,14 +37,23 @@ module.exports = (api, options) => {
           );
         // add copy agrs
         config.plugin('copy').tap(args => {
-          // args[0][0].ignore.push(dll.outputDir + '/**');
-          // args[0].push({
-          //   from: dll.outputPath,
-          //   toType: 'dir',
-          //   ignore: ['*.js', '*.css', '*.manifest.json']
-          // });
+          // 解析最后一部分
+          const lastPath = path.basename(dll.outputPath);
+          // console.log('lastPath' + lastPath);
+          args[0][0].ignore.push(`${lastPath}/**`);
+          args[0][0].ignore.push(`${lastPath}/*.manifest.json`);
+          args[0].push({
+            from: dll.outputPath,
+            toType: 'dir',
+            ignore: ['*.js', '*.css', '*.manifest.json']
+          });
+          // console.log('args', args, args[0]);
+          // console.log('args', path.dirname(dll.outputPath));
+          // console.log(process.cwd(), dll.outputPath);
+          // console.log(path.relative(process.cwd(), dll.outputPath));
           return args;
         });
+        // console.log(config);
       }
     });
   });
@@ -66,8 +77,8 @@ module.exports = (api, options) => {
 
       api.chainWebpack(config => {
         const extractOptions = Object.assign({
-          filename: 'css/[name].[contenthash:8].css',
-          chunkFilename: 'css/[name].[contenthash:8].css'
+          filename: `${baseDllPath}/css/[name].[contenthash:8].css`,
+          chunkFilename: `${baseDllPath}/css/[name].[contenthash:8].css`
         }, {});
 
         config
@@ -92,7 +103,7 @@ module.exports = (api, options) => {
             .loader('url-loader')
             .tap((options) => {
               // options.fallback loader -> file-loader
-              options.fallback.options['name'] = `${type === 'images' ? 'img' : type}/[name].[hash:8].[ext]`;
+              options.fallback.options['name'] = `${baseDllPath}/${type === 'images' ? 'img' : type}/[name].[hash:8].[ext]`;
               return options;
             })
             .end();
@@ -104,7 +115,7 @@ module.exports = (api, options) => {
           .use('file-loader')
           .loader('file-loader')
           .tap((options) => {
-            options['name'] = 'img/[name].[hash:8].[ext]';
+            options['name'] = `${baseDllPath}/img/[name].[hash:8].[ext]`;
             return options;
           })
           .end();
@@ -121,7 +132,7 @@ module.exports = (api, options) => {
               .use('extract-css-loader')
               .loader(require('mini-css-extract-plugin').loader)
               .options({
-                publicPath: '../'
+                publicPath: '../../'
               })
           )
         );
