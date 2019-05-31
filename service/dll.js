@@ -193,7 +193,7 @@ module.exports = class Dll {
         .map(getAssetHtmlPluginDefaultArg);
     } else {
       // TODO: remove next verson
-      console.warn('您更新最新版本，请您重新构建一下dll文件，执行npm run dll');
+      // console.warn('您更新最新版本，请您重新构建一下dll文件，执行npm run dll');
       assetHtmlPluginArg = compose(
         getAssetHtmlPluginDefaultArg,
         resolvePathRelativeOutputPathBind,
